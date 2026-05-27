@@ -1,0 +1,8 @@
+services:
+  backend:
+    environment:
+      LOG_LEVEL: debug
+
+  worker:
+    environment:
+      LOG_LEVEL: debug

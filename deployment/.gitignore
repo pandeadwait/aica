@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+volumes/
+postgres_data/
+ollama_data/
+documents_data/
+artifacts_data/
+app_temp_data/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.log
+**/.DS_Store

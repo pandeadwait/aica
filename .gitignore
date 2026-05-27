@@ -1,0 +1,51 @@
+# OS / editor
+.DS_Store
+**/.DS_Store
+
+# Environment files
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python caches / virtualenvs
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Local deployment/runtime data
+volumes/
+deployment/volumes/
+deployment/postgres_data/
+deployment/ollama_data/
+deployment/documents_data/
+deployment/artifacts_data/
+deployment/app_temp_data/
+
+# Local model/runtime caches
+.ollama/
+ollama_data/
+models/
+
