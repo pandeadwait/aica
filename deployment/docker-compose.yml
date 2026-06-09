@@ -98,6 +98,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       LLM_BASE_URL: http://llm:11434
       LLM_MODEL: ${OLLAMA_MODEL}
+      BACKEND_BASE_URL: http://backend:8000
+      PROCESSING_POLL_INTERVAL_SECONDS: ${PROCESSING_POLL_INTERVAL_SECONDS:-10}
     volumes:
       - documents_data:${APP_DOCUMENTS_DIR}
       - artifacts_data:${APP_ARTIFACTS_DIR}
@@ -106,6 +108,8 @@ services:
       postgres:
         condition: service_healthy
       llm:
+        condition: service_healthy
+      backend:
         condition: service_healthy
     restart: unless-stopped
 

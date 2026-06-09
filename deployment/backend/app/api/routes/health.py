@@ -14,7 +14,7 @@ async def root() -> dict[str, str]:
     settings = get_settings()
     return {
         "service": "backend",
-        "status": "phase0",
+        "status": "phase3",
         "environment": settings.app_env,
     }
 
@@ -33,4 +33,3 @@ async def health(request: Request) -> dict[str, object]:
         },
         "startup_checks": getattr(request.app.state, "startup_checks", {}),
     }
-

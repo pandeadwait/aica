@@ -18,6 +18,7 @@ Important notes:
 - Nothing has been executed.
 - The frontend is still a placeholder.
 - The backend and worker now implement the Phase 0 foundation needed for later phases.
+- The backend now also includes Phase 1, Phase 2, and Phase 3 filing, document, and parsing APIs.
 
 ## Layout
 
@@ -56,6 +57,9 @@ The backend and worker are not final application implementations yet, but they a
 - DB and LLM runtime checks
 - migration bootstrap
 - worker startup checks and heartbeat loop
+- filing and taxpayer profile APIs
+- document intake, replacement, and versioning APIs
+- Phase 3 processing jobs, validation, parsing, extraction, provenance, and normalization flows
 
 ## Expected future flow
 

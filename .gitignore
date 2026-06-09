@@ -48,4 +48,5 @@ deployment/app_temp_data/
 .ollama/
 ollama_data/
 models/
-
+!deployment/backend/app/models/
+!deployment/backend/app/models/*.py

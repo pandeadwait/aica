@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.api.routes import documents
 from app.api.routes import filings
 from app.api.routes import health
+from app.api.routes import processing
 from app.config import get_settings
 from app.services.runtime_checks import check_database, check_llm
 from app.services.storage import ensure_storage_directories
@@ -26,10 +27,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Tax Assistant Backend",
-    version="0.1.0-phase0",
+    version="0.3.0-phase3",
     lifespan=lifespan,
 )
 
 app.include_router(health.router)
 app.include_router(filings.router)
 app.include_router(documents.router)
+app.include_router(processing.router)
+app.include_router(processing.internal_router)

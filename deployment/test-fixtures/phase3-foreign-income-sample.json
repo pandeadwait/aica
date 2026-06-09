@@ -1,0 +1,12 @@
+{
+  "document_type": "foreign_dividend_statement",
+  "assessment_year": 2026,
+  "financial_year": "2025-2026",
+  "broker_platform": "Example Broker",
+  "country": "United States",
+  "security_identifier": "EXMPL",
+  "event_date": "2025-08-15",
+  "foreign_dividend_amount": "USD 125.50",
+  "withholding_amount": "USD 31.38",
+  "note": "Phase 3 structured-file normalization sample."
+}
