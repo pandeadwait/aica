@@ -1,0 +1,14 @@
+{
+  "document_type": "bank_statement",
+  "statement_period": "2025-04-01 to 2026-03-31",
+  "account holder": "Aarav Sharma",
+  "bank name": "Example Bank Limited",
+  "account no": "XXXX1234",
+  "entries": [
+    {
+      "payment amount": "18450.00",
+      "tax deducted at source": "1845.00",
+      "narration": "Fixed deposit interest credit"
+    }
+  ]
+}

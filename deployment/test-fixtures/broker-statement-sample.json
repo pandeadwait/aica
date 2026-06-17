@@ -1,0 +1,12 @@
+{
+  "document_type": "Broker Statement",
+  "assessment_year": "2026",
+  "financial_year": "2025-2026",
+  "broker_platform": "Example Securities",
+  "country": "India",
+  "security_identifier": "INFY",
+  "dividend_income": "2400.00",
+  "short_term_capital_gain": "12500.00",
+  "long_term_capital_gain": "8300.00",
+  "event_date": "2025-12-30"
+}

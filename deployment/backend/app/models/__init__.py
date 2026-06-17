@@ -15,6 +15,17 @@ from app.models.processing import (
     ProcessingJobType,
     RawExtraction,
 )
+from app.models.review import (
+    CategoryAssignment,
+    GapItem,
+    GapResolution,
+    GapResolutionStatus,
+    GapSeverity,
+    ManualOverride,
+    ReconciliationStatus,
+    ReviewItemStatus,
+    ReviewSession,
+)
 from app.models.residency_detail import ResidencyDetail
 from app.models.taxpayer_profile import TaxpayerProfile
 
@@ -40,6 +51,15 @@ __all__ = [
     "NormalizedTaxItem",
     "NormalizedTaxItemCategory",
     "ForeignIncomeEvent",
+    "CategoryAssignment",
+    "ManualOverride",
+    "ReviewSession",
+    "ReviewItemStatus",
+    "ReconciliationStatus",
+    "GapItem",
+    "GapResolution",
+    "GapSeverity",
+    "GapResolutionStatus",
     "ResidencyDetail",
     "TaxpayerProfile",
 ]

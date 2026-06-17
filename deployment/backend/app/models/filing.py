@@ -47,6 +47,9 @@ class Filing(Base):
     residency_detail: Mapped["ResidencyDetail | None"] = relationship(back_populates="filing", uselist=False)
     status_history: Mapped[list["FilingStatusHistory"]] = relationship(back_populates="filing")
     documents: Mapped[list["Document"]] = relationship(back_populates="filing")
+    category_assignments: Mapped[list["CategoryAssignment"]] = relationship(back_populates="filing")
+    review_sessions: Mapped[list["ReviewSession"]] = relationship(back_populates="filing")
+    gap_items: Mapped[list["GapItem"]] = relationship(back_populates="filing")
 
 
 class FilingStatusHistory(Base):
@@ -69,5 +72,6 @@ class FilingStatusHistory(Base):
 
 from app.models.bank_account import BankAccount  # noqa: E402
 from app.models.document import Document  # noqa: E402
+from app.models.review import CategoryAssignment, GapItem, ReviewSession  # noqa: E402
 from app.models.residency_detail import ResidencyDetail  # noqa: E402
 from app.models.taxpayer_profile import TaxpayerProfile  # noqa: E402

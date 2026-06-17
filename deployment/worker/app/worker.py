@@ -25,7 +25,7 @@ async def run() -> None:
         "model": settings.llm_model,
         "backend_base_url": settings.backend_base_url,
     }
-    print(json.dumps({"worker": "phase3", "startup": startup_status}))
+    print(json.dumps({"worker": "phase4", "startup": startup_status}))
 
     while True:
         heartbeat = {
@@ -36,7 +36,7 @@ async def run() -> None:
         print(
             json.dumps(
                 {
-                    "worker": "phase3-heartbeat",
+                    "worker": "phase4-heartbeat",
                     "checks": heartbeat,
                     "processing": processing,
                 }

@@ -14,7 +14,7 @@ async def root() -> dict[str, str]:
     settings = get_settings()
     return {
         "service": "backend",
-        "status": "phase3",
+        "status": "phase4",
         "environment": settings.app_env,
     }
 

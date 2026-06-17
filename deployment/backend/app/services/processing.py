@@ -83,6 +83,86 @@ OCR_CONTENT_FORMAT = "ocr_text"
 PDF_CONTENT_FORMAT = "pdf_text"
 PAGE_MARKER_PATTERN = re.compile(r"^\[page:(\d+)\]$")
 
+DOCUMENT_TYPE_PATTERNS: dict[str, tuple[str, ...]] = {
+    "form16": ("form 16", "form16", "part a", "part b", "salary certificate"),
+    "form26as": ("form 26as", "26as", "tax credit statement", "part a1", "part a2"),
+    "ais": ("annual information statement", "ais", "taxpayer information summary", "tis"),
+    "salary_slip": ("salary slip", "payslip", "pay slip", "earnings", "deductions"),
+    "interest_certificate": ("interest certificate", "interest paid", "savings interest", "fixed deposit interest"),
+    "bank_statement": ("bank statement", "account statement", "statement period", "interest_period", "account_holder_name", "issuer_name"),
+    "capital_gains_statement": ("capital gains", "short term capital gain", "long term capital gain"),
+    "broker_statement": ("broker statement", "contract note", "trading statement"),
+    "dividend_statement": ("dividend statement", "dividend advice"),
+    "foreign_dividend_statement": ("foreign dividend", "withholding tax", "broker platform"),
+    "rsu_statement": ("rsu", "restricted stock unit", "vesting"),
+    "esop_statement": ("esop", "employee stock option"),
+    "rent_receipt": ("rent receipt", "landlord", "house rent"),
+    "home_loan_certificate": ("home loan", "interest certificate", "principal repaid"),
+    "insurance_premium_proof": ("insurance premium", "life insurance", "premium paid"),
+    "ppf_elss_proof": ("ppf", "elss", "tax saver", "80c investment"),
+    "donation_receipt": ("donation", "80g", "receipt no"),
+    "tuition_fee_receipt": ("tuition fee", "school fee", "education fee"),
+    "medical_insurance_document": ("medical insurance", "health insurance", "80d"),
+}
+
+FIELD_ALIAS_PATTERNS: list[tuple[str, tuple[str, ...]]] = [
+    ("assessment_year", ("assessment year", "ay")),
+    ("financial_year", ("financial year", "fy")),
+    ("employer_name", ("employer", "employer name", "deductor name")),
+    ("employee_name", ("employee", "employee name", "assessee name")),
+    ("account_holder_name", ("account holder", "account holder name", "customer name")),
+    ("issuer_name", ("issuer", "issuer name", "bank name", "institution name")),
+    ("account_number_masked", ("account number", "account no", "masked account number")),
+    ("pan", ("pan", "pan no", "pan number")),
+    ("tan", ("tan", "tan no", "tan number")),
+    ("gross_salary", ("gross salary", "gross total salary", "income under the head salaries", "salary as per provisions contained in section 17(1)", "taxable salary")),
+    ("basic_salary", ("basic salary", "basic pay")),
+    ("salary_income", ("salary income", "net salary")),
+    ("net_pay", ("net pay", "take home", "take-home", "take home pay")),
+    ("payslip_month", ("salary month", "pay month", "month")),
+    ("payslip_period", ("pay period", "salary period")),
+    ("interest_period", ("interest period", "deposit period", "statement period")),
+    ("standard_deduction", ("standard deduction",)),
+    ("professional_tax", ("professional tax",)),
+    ("house_rent_allowance", ("hra", "house rent allowance")),
+    ("special_allowance", ("special allowance",)),
+    ("other_allowance", ("other allowance", "other earnings")),
+    ("bonus", ("bonus", "performance bonus")),
+    ("provident_fund_employee", ("employee pf", "employee provident fund", "epf employee")),
+    ("provident_fund_employer", ("employer pf", "employer provident fund", "epf employer")),
+    ("interest_income", ("interest income", "bank interest", "savings interest", "deposit interest", "interest paid")),
+    ("dividend_income", ("dividend income", "domestic dividend")),
+    ("foreign_dividend_amount", ("foreign dividend", "dividend amount", "gross dividend")),
+    ("short_term_capital_gain", ("short term capital gain", "stcg", "short-term capital gain")),
+    ("long_term_capital_gain", ("long term capital gain", "ltcg", "long-term capital gain")),
+    ("capital_gains_total", ("capital gains total", "total capital gains", "net capital gain")),
+    ("sale_proceeds", ("sale proceeds", "gross sale value", "sell value")),
+    ("cost_basis", ("cost basis", "purchase cost", "acquisition cost", "cost of acquisition")),
+    ("security_name", ("security name", "stock name", "company name", "instrument")),
+    ("quantity", ("quantity", "units", "shares")),
+    ("transaction_type", ("transaction type", "event type", "activity type")),
+    ("withholding_amount", ("withholding", "withholding tax", "foreign tax withheld", "tax withheld")),
+    ("tax_deducted", ("tax deducted", "tds", "total tds", "tax deducted at source", "tds deducted", "tax credit")),
+    ("tax_collected", ("tax collected", "tcs")),
+    ("deductor_name", ("deductor", "deductor name")),
+    ("income_paid", ("income paid", "amount paid", "payment amount")),
+    ("deduction_80c", ("80c", "section 80c")),
+    ("deduction_80d", ("80d", "section 80d")),
+    ("deduction_housing_loan", ("housing loan", "home loan interest", "section 24")),
+    ("investment_amount", ("investment amount", "amount invested", "deposit amount")),
+    ("premium_paid", ("premium paid", "insurance premium", "medical insurance premium")),
+    ("donation_amount", ("donation amount", "amount donated")),
+    ("tuition_fee_amount", ("tuition fee", "education fee", "school fee")),
+    ("rent_paid", ("rent paid", "monthly rent")),
+    ("home_loan_interest", ("home loan interest", "interest paid on housing loan")),
+    ("advance_tax", ("advance tax",)),
+    ("self_assessment_tax", ("self assessment tax", "self-assessment tax")),
+    ("broker_platform", ("broker platform", "broker", "platform")),
+    ("country", ("country", "source country")),
+    ("security_identifier", ("security identifier", "isin", "ticker", "symbol")),
+    ("event_date", ("event date", "transaction date", "dividend date", "credit date")),
+]
+
 
 @dataclass
 class ParsedPayload:
@@ -351,6 +431,7 @@ def _run_validation_stage(
 ) -> None:
     file_bytes = Path(storage_path).read_bytes()
     text_probe = _extract_text_probe(file_bytes, version.file_extension)
+    inferred_document_type = _set_inferred_document_type(document, version, text_probe)
     validation_state = DocumentValidationState.relevant
     is_relevant = _looks_tax_related(document, version, text_probe)
     year_label, year_matches = _detect_year_match(document.filing, text_probe)
@@ -378,6 +459,8 @@ def _run_validation_stage(
     else:
         reason_parts.append("The document looks relevant and locally parseable for Phase 3 processing.")
 
+    if inferred_document_type:
+        reason_parts.append(f"Detected document type: {inferred_document_type}.")
     if year_label:
         reason_parts.append(f"Detected year context: {year_label}.")
     if not reason_parts:
@@ -411,6 +494,7 @@ def _run_parse_stage(
 ) -> None:
     file_bytes = Path(storage_path).read_bytes()
     parsed = _parse_file_bytes(file_bytes, version.file_extension)
+    _set_inferred_document_type(document, version, parsed.text_content or "")
     db.add(
         RawExtraction(
             id=str(uuid4()),
@@ -446,6 +530,7 @@ def _run_ocr_stage(
 ) -> None:
     file_bytes = Path(storage_path).read_bytes()
     parsed = _ocr_pdf_file(file_bytes)
+    inferred_document_type = _set_inferred_document_type(document, version, parsed.text_content or "")
     db.add(
         RawExtraction(
             id=str(uuid4()),
@@ -481,6 +566,8 @@ def _run_ocr_stage(
     reason = "OCR fallback extracted text from the PDF and Phase 3 processing continued successfully."
     if not is_relevant:
         reason = "OCR fallback extracted text, but the document still needs review for tax relevance."
+    if inferred_document_type:
+        reason = f"{reason} Detected document type: {inferred_document_type}."
     if detected_year_label:
         reason = f"{reason} Detected year context: {detected_year_label}."
     _record_validation_result(
@@ -560,7 +647,7 @@ def _run_normalization_stage(
     )
     field_map = {field.field_name.lower(): field for field in fields}
     for field in fields:
-        item = _normalized_item_for_field(field)
+        item = _normalized_item_for_field(field, document.document_type)
         if item is None:
             continue
         normalized = NormalizedTaxItem(
@@ -595,6 +682,8 @@ def _extract_text_probe(file_bytes: bytes, extension: str) -> str:
 
 
 def _looks_tax_related(document: Document, version, text_probe: str) -> bool:
+    if _infer_document_type(document, version, text_probe) is not None:
+        return True
     haystacks = [
         (document.document_type or "").lower(),
         (document.source or "").lower(),
@@ -620,6 +709,126 @@ def _detect_year_match(filing: Filing | None, text_probe: str) -> tuple[str | No
     return label, year_matches
 
 
+def _infer_document_type(document: Document, version: DocumentVersion, text_probe: str) -> str | None:
+    explicit = (document.document_type or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if explicit:
+        return explicit
+
+    normalized_text_probe = text_probe.lower()
+    for document_type in DOCUMENT_TYPE_PATTERNS:
+        exact_markers = {
+            f'"document_type": "{document_type}"',
+            f'"document_type":"{document_type}"',
+            f'"document type": "{document_type}"',
+            f'"document_type": "{document_type.replace("_", " ")}"',
+            f'"document_type":"{document_type.replace("_", " ")}"',
+        }
+        if any(marker in normalized_text_probe for marker in exact_markers):
+            return document_type
+
+    haystacks = [
+        (version.original_filename or "").lower(),
+        (document.source or "").lower(),
+        normalized_text_probe,
+    ]
+    for document_type, patterns in DOCUMENT_TYPE_PATTERNS.items():
+        normalized_patterns = set(patterns) | {document_type, document_type.replace("_", " ")}
+        if any(pattern in haystack for haystack in haystacks for pattern in normalized_patterns):
+            return document_type
+    return None
+
+
+def _set_inferred_document_type(document: Document, version: DocumentVersion, text_probe: str) -> str | None:
+    inferred = _infer_document_type(document, version, text_probe)
+    if inferred is not None and not document.document_type:
+        document.document_type = inferred
+    return inferred
+
+
+def _canonicalize_field_name(field_name: str) -> str:
+    normalized = re.sub(r"[\s\-\/]+", "_", field_name.strip().lower())
+    normalized = re.sub(r"[^a-z0-9_.\[\]_]", "", normalized)
+    last_segment = normalized.split(".")[-1]
+    last_segment = re.sub(r"\[\d+\]", "", last_segment)
+    for canonical_name, patterns in FIELD_ALIAS_PATTERNS:
+        if last_segment == canonical_name:
+            return canonical_name
+        if any(_alias_matches(last_segment, pattern) for pattern in patterns):
+            return canonical_name
+    return normalized or "value"
+
+
+def _alias_matches(last_segment: str, pattern: str) -> bool:
+    normalized_segment = last_segment.replace("_", " ").strip()
+    normalized_pattern = pattern.replace("_", " ").strip().lower()
+    if normalized_segment == normalized_pattern:
+        return True
+
+    segment_tokens = normalized_segment.split()
+    pattern_tokens = normalized_pattern.split()
+
+    if len(pattern_tokens) == 1:
+        return normalized_pattern in segment_tokens
+
+    segment_phrase = f" {' '.join(segment_tokens)} "
+    pattern_phrase = f" {' '.join(pattern_tokens)} "
+    return pattern_phrase in segment_phrase
+
+
+def _document_category_hints(document_type: str | None) -> set[NormalizedTaxItemCategory]:
+    if document_type == "form16":
+        return {NormalizedTaxItemCategory.salary_income, NormalizedTaxItemCategory.tds_credits}
+    if document_type == "salary_slip":
+        return {
+            NormalizedTaxItemCategory.salary_income,
+            NormalizedTaxItemCategory.tds_credits,
+            NormalizedTaxItemCategory.deductions,
+        }
+    if document_type in {"interest_certificate", "bank_statement"}:
+        return {
+            NormalizedTaxItemCategory.interest_income,
+            NormalizedTaxItemCategory.tds_credits,
+        }
+    if document_type in {"broker_statement", "capital_gains_statement"}:
+        return {
+            NormalizedTaxItemCategory.capital_gains,
+            NormalizedTaxItemCategory.domestic_dividend_income,
+            NormalizedTaxItemCategory.foreign_dividend_income,
+            NormalizedTaxItemCategory.other_sources,
+        }
+    if document_type == "dividend_statement":
+        return {
+            NormalizedTaxItemCategory.domestic_dividend_income,
+            NormalizedTaxItemCategory.other_sources,
+        }
+    if document_type in {
+        "insurance_premium_proof",
+        "ppf_elss_proof",
+        "donation_receipt",
+        "tuition_fee_receipt",
+        "medical_insurance_document",
+        "rent_receipt",
+        "home_loan_certificate",
+    }:
+        return {NormalizedTaxItemCategory.deductions}
+    if document_type == "form26as":
+        return {
+            NormalizedTaxItemCategory.tds_credits,
+            NormalizedTaxItemCategory.interest_income,
+            NormalizedTaxItemCategory.other_sources,
+        }
+    if document_type == "ais":
+        return {
+            NormalizedTaxItemCategory.salary_income,
+            NormalizedTaxItemCategory.interest_income,
+            NormalizedTaxItemCategory.tds_credits,
+            NormalizedTaxItemCategory.domestic_dividend_income,
+            NormalizedTaxItemCategory.capital_gains,
+            NormalizedTaxItemCategory.other_sources,
+        }
+    return set()
+
+
 def _parse_file_bytes(file_bytes: bytes, extension: str) -> ParsedPayload:
     if extension == "json":
         payload = json.loads(file_bytes.decode("utf-8"))
@@ -641,24 +850,19 @@ def _parse_file_bytes(file_bytes: bytes, extension: str) -> ParsedPayload:
         )
     if extension == "csv":
         decoded = _decode_text(file_bytes)
-        rows = list(csv.DictReader(StringIO(decoded)))
+        rows = _parse_csv_rows(decoded)
         return ParsedPayload(
             content_format="csv",
             payload_json=rows,
-            text_content="\n".join(",".join(f"{key}={value}" for key, value in row.items()) for row in rows),
+            text_content=_structured_payload_text(rows),
             source_type="structured_file",
         )
     if extension == "xlsx":
         sheets = _parse_xlsx_rows(file_bytes)
-        text_lines: list[str] = []
-        for sheet_name, rows in sheets.items():
-            text_lines.append(f"[sheet:{sheet_name}]")
-            for row in rows:
-                text_lines.append(", ".join(str(cell) for cell in row if cell is not None))
         return ParsedPayload(
             content_format="xlsx",
             payload_json=sheets,
-            text_content="\n".join(line for line in text_lines if line.strip()),
+            text_content=_structured_payload_text(sheets),
             source_type="structured_file",
         )
     if extension == "pdf":
@@ -689,7 +893,15 @@ def _xml_element_to_dict(element: ET.Element) -> dict[str, object]:
     return node
 
 
-def _parse_xlsx_rows(file_bytes: bytes) -> dict[str, list[list[str | None]]]:
+def _parse_csv_rows(decoded_text: str) -> dict[str, object]:
+    reader = csv.reader(StringIO(decoded_text))
+    rows = [[_clean_cell_text(cell) for cell in row] for row in reader]
+    if not rows:
+        return {"headers": [], "rows": []}
+    return _tabular_rows_to_payload(rows)
+
+
+def _parse_xlsx_rows(file_bytes: bytes) -> dict[str, dict[str, object]]:
     with ZipFile(BytesIO(file_bytes)) as archive:
         shared_strings = _xlsx_shared_strings(archive)
         workbook = ET.fromstring(archive.read("xl/workbook.xml"))
@@ -702,7 +914,7 @@ def _parse_xlsx_rows(file_bytes: bytes) -> dict[str, list[list[str | None]]]:
             relationship.attrib["Id"]: relationship.attrib["Target"]
             for relationship in rels.findall("rel:Relationship", namespace)
         }
-        sheets: dict[str, list[list[str | None]]] = {}
+        sheets: dict[str, dict[str, object]] = {}
         for sheet in workbook.findall("main:sheets/main:sheet", namespace):
             name = sheet.attrib.get("name", "Sheet")
             rel_id = sheet.attrib.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
@@ -726,7 +938,7 @@ def _parse_xlsx_rows(file_bytes: bytes) -> dict[str, list[list[str | None]]]:
                         cell_text = value.text
                     values.append(cell_text)
                 rows.append(values)
-            sheets[name] = rows
+            sheets[name] = _tabular_rows_to_payload(rows)
         return sheets
 
 
@@ -808,7 +1020,7 @@ def _ocr_pdf_file(file_bytes: bytes) -> ParsedPayload:
 def _fields_from_raw_extraction(raw_extraction: RawExtraction) -> list[tuple[str, str, str, str | None, int | None]]:
     fields: list[tuple[str, str, str, str | None, int | None]] = []
     if raw_extraction.payload_json is not None and raw_extraction.content_format in STRUCTURED_CONTENT_FORMATS:
-        fields.extend(_flatten_payload(raw_extraction.payload_json))
+        fields.extend(_flatten_structured_payload(raw_extraction.payload_json))
     if raw_extraction.text_content and raw_extraction.content_format not in STRUCTURED_CONTENT_FORMATS:
         current_page: int | None = None
         for line_number, line in enumerate(raw_extraction.text_content.splitlines(), start=1):
@@ -822,10 +1034,14 @@ def _fields_from_raw_extraction(raw_extraction: RawExtraction) -> list[tuple[str
             locator_prefix = f"page:{current_page}:" if current_page is not None else ""
             if ":" in stripped:
                 key, value = stripped.split(":", 1)
-                fields.append((key.strip(), value.strip(), "text", f"{locator_prefix}line:{line_number}", current_page))
+                fields.append(
+                    (_canonicalize_field_name(key), value.strip(), "text", f"{locator_prefix}line:{line_number}", current_page)
+                )
             elif "=" in stripped:
                 key, value = stripped.split("=", 1)
-                fields.append((key.strip(), value.strip(), "text", f"{locator_prefix}line:{line_number}", current_page))
+                fields.append(
+                    (_canonicalize_field_name(key), value.strip(), "text", f"{locator_prefix}line:{line_number}", current_page)
+                )
             else:
                 fields.append((f"text_line_{line_number}", stripped, "text", f"{locator_prefix}line:{line_number}", current_page))
     deduped: list[tuple[str, str, str, str | None, int | None]] = []
@@ -838,20 +1054,163 @@ def _fields_from_raw_extraction(raw_extraction: RawExtraction) -> list[tuple[str
     return deduped
 
 
+def _flatten_structured_payload(payload: object, prefix: str = "") -> list[tuple[str, str, str, str | None, int | None]]:
+    if isinstance(payload, dict):
+        row_fields = _flatten_table_payload(payload, prefix)
+        if row_fields:
+            return row_fields
+    return _flatten_payload(payload, prefix)
+
+
 def _flatten_payload(payload: object, prefix: str = "") -> list[tuple[str, str, str, str | None, int | None]]:
     fields: list[tuple[str, str, str, str | None, int | None]] = []
     if isinstance(payload, dict):
         for key, value in payload.items():
             child_prefix = f"{prefix}.{key}" if prefix else str(key)
-            fields.extend(_flatten_payload(value, child_prefix))
+            fields.extend(_flatten_structured_payload(value, child_prefix))
     elif isinstance(payload, list):
         for index, value in enumerate(payload):
             child_prefix = f"{prefix}[{index}]"
-            fields.extend(_flatten_payload(value, child_prefix))
+            fields.extend(_flatten_structured_payload(value, child_prefix))
     elif payload is not None:
         value_type = type(payload).__name__
-        fields.append((prefix or "value", str(payload), value_type, prefix or None, None))
+        canonical_name = _canonicalize_field_name(prefix or "value")
+        fields.append((canonical_name, str(payload), value_type, prefix or None, None))
     return fields
+
+
+def _flatten_table_payload(payload: dict[str, object], prefix: str = "") -> list[tuple[str, str, str, str | None, int | None]]:
+    rows = payload.get("rows")
+    headers = payload.get("headers")
+    if not isinstance(rows, list) or not isinstance(headers, list):
+        return []
+
+    fields: list[tuple[str, str, str, str | None, int | None]] = []
+    table_prefix = prefix or "table"
+    for row_index, row in enumerate(rows, start=1):
+        if not isinstance(row, dict):
+            continue
+        for key, value in row.items():
+            if key.startswith("_") or value in (None, ""):
+                continue
+            canonical_name = _canonicalize_field_name(key)
+            value_type = type(value).__name__
+            locator = f"{table_prefix}.row:{row_index}.column:{canonical_name}"
+            fields.append((canonical_name, str(value), value_type, locator, None))
+    return fields
+
+
+def _tabular_rows_to_payload(rows: list[list[str | None]]) -> dict[str, object]:
+    normalized_rows = [_trim_row(row) for row in rows if any(cell not in (None, "") for cell in row)]
+    if not normalized_rows:
+        return {"headers": [], "rows": []}
+
+    header_index = _detect_header_row_index(normalized_rows)
+    if header_index is None:
+        return {
+            "headers": [],
+            "rows": [
+                {"value": " | ".join(cell for cell in row if cell)}
+                for row in normalized_rows
+            ],
+        }
+
+    headers = [_normalize_header_cell(cell, position) for position, cell in enumerate(normalized_rows[header_index], start=1)]
+    data_rows: list[dict[str, str]] = []
+    for row in normalized_rows[header_index + 1 :]:
+        row_dict: dict[str, str] = {}
+        for position, header in enumerate(headers):
+            if not header:
+                continue
+            cell = row[position] if position < len(row) else None
+            cleaned = _clean_cell_text(cell)
+            if cleaned:
+                row_dict[header] = cleaned
+        if row_dict:
+            data_rows.append(row_dict)
+
+    if data_rows:
+        return {"headers": headers, "rows": data_rows}
+
+    return {
+        "headers": [],
+        "rows": [
+            {"value": " | ".join(cell for cell in row if cell)}
+            for row in normalized_rows
+        ],
+    }
+
+
+def _detect_header_row_index(rows: list[list[str | None]]) -> int | None:
+    for index, row in enumerate(rows[:5]):
+        populated = [cell for cell in row if cell not in (None, "")]
+        if len(populated) < 2:
+            continue
+        if any(_looks_like_header_cell(cell or "") for cell in populated):
+            return index
+    return None
+
+
+def _looks_like_header_cell(value: str) -> bool:
+    cleaned = _clean_cell_text(value)
+    if not cleaned:
+        return False
+    if _parse_amount(cleaned) is not None or _parse_date(cleaned) is not None:
+        return False
+    alpha_count = sum(character.isalpha() for character in cleaned)
+    return alpha_count >= max(2, len(cleaned) // 3)
+
+
+def _normalize_header_cell(value: str | None, position: int) -> str:
+    cleaned = _clean_cell_text(value)
+    if not cleaned:
+        return f"column_{position}"
+    return _canonicalize_field_name(cleaned)
+
+
+def _trim_row(row: list[str | None]) -> list[str | None]:
+    trimmed = list(row)
+    while trimmed and trimmed[-1] in (None, ""):
+        trimmed.pop()
+    return [_clean_cell_text(cell) for cell in trimmed]
+
+
+def _clean_cell_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    cleaned = str(value).strip()
+    return cleaned or None
+
+
+def _structured_payload_text(payload: object) -> str:
+    lines: list[str] = []
+
+    def walk(node: object, prefix: str = "") -> None:
+        if isinstance(node, dict):
+            row_payload = _flatten_table_payload(node, prefix)
+            if row_payload:
+                current_prefix = prefix or "table"
+                lines.append(f"[table:{current_prefix}]")
+                headers = node.get("headers")
+                if isinstance(headers, list) and headers:
+                    lines.append(f"{current_prefix}.headers={', '.join(str(header) for header in headers if header)}")
+                for field_name, field_value, _, locator, _ in row_payload:
+                    lines.append(f"{locator or current_prefix}:{field_name}={field_value}")
+                return
+            for key, value in node.items():
+                child_prefix = f"{prefix}.{key}" if prefix else str(key)
+                walk(value, child_prefix)
+            return
+        if isinstance(node, list):
+            for index, value in enumerate(node):
+                child_prefix = f"{prefix}[{index}]" if prefix else f"row[{index}]"
+                walk(value, child_prefix)
+            return
+        if node not in (None, ""):
+            lines.append(f"{prefix or 'value'}={node}")
+
+    walk(payload)
+    return "\n".join(line for line in lines if line.strip())
 
 
 def _confidence_for_source(content_format: str) -> Decimal:
@@ -891,18 +1250,19 @@ def _parse_amount(value: str) -> Decimal | None:
         return None
 
 
-def _normalized_item_for_field(field: ParsedField) -> dict[str, object] | None:
+def _normalized_item_for_field(field: ParsedField, document_type: str | None) -> dict[str, object] | None:
     field_name = field.field_name.lower()
     value = field.field_value_text
     amount = _parse_amount(value)
     category: NormalizedTaxItemCategory | None = None
     subcategory: str | None = None
     description = field.field_name
+    document_hints = _document_category_hints(document_type)
 
-    if any(keyword in field_name for keyword in ("salary", "basic_pay", "gross_salary")) and amount is not None:
+    if field_name in {"gross_salary", "basic_salary", "salary_income"} and amount is not None:
         category = NormalizedTaxItemCategory.salary_income
         subcategory = "salary"
-    elif "interest" in field_name and amount is not None:
+    elif field_name == "interest_income" and amount is not None:
         category = NormalizedTaxItemCategory.interest_income
         subcategory = "interest"
     elif "dividend" in field_name and amount is not None:
@@ -913,10 +1273,13 @@ def _normalized_item_for_field(field: ParsedField) -> dict[str, object] | None:
             else NormalizedTaxItemCategory.domestic_dividend_income
         )
         subcategory = "dividend"
+    elif field_name in {"short_term_capital_gain", "long_term_capital_gain", "capital_gains_total"} and amount is not None:
+        category = NormalizedTaxItemCategory.capital_gains
+        subcategory = field_name
     elif any(keyword in field_name for keyword in ("rsu", "esop", "vesting", "capital_gain", "capital_gains")) and amount is not None:
         category = NormalizedTaxItemCategory.capital_gains
         subcategory = "equity_event"
-    elif "tds" in field_name and amount is not None:
+    elif field_name in {"tax_deducted", "tax_collected"} and amount is not None:
         category = NormalizedTaxItemCategory.tds_credits
         subcategory = "tds"
     elif "advance_tax" in field_name and amount is not None:
@@ -928,9 +1291,52 @@ def _normalized_item_for_field(field: ParsedField) -> dict[str, object] | None:
     elif any(keyword in field_name for keyword in ("deduction", "80c", "80d", "elss", "ppf", "donation")) and amount is not None:
         category = NormalizedTaxItemCategory.deductions
         subcategory = "deduction"
+    elif amount is not None and document_type in {
+        "insurance_premium_proof",
+        "ppf_elss_proof",
+        "donation_receipt",
+        "tuition_fee_receipt",
+        "medical_insurance_document",
+        "rent_receipt",
+        "home_loan_certificate",
+    } and field_name in {
+        "investment_amount",
+        "premium_paid",
+        "donation_amount",
+        "tuition_fee_amount",
+        "rent_paid",
+        "home_loan_interest",
+    }:
+        category = NormalizedTaxItemCategory.deductions
+        subcategory = field_name
     elif "withholding" in field_name and amount is not None:
-        category = NormalizedTaxItemCategory.other_sources
+        category = (
+            NormalizedTaxItemCategory.tds_credits
+            if document_type in {"form16", "form26as", "ais"}
+            else NormalizedTaxItemCategory.other_sources
+        )
         subcategory = "foreign_reference"
+    elif amount is not None and field_name in {"income_paid"} and NormalizedTaxItemCategory.interest_income in document_hints:
+        category = NormalizedTaxItemCategory.interest_income
+        subcategory = "interest"
+    elif amount is not None and field_name in {"income_paid"} and NormalizedTaxItemCategory.salary_income in document_hints:
+        category = NormalizedTaxItemCategory.salary_income
+        subcategory = "salary"
+    elif amount is not None and field_name in {"income_paid"} and NormalizedTaxItemCategory.other_sources in document_hints:
+        category = NormalizedTaxItemCategory.other_sources
+        subcategory = "reported_income"
+    elif amount is not None and field_name in {"sale_proceeds", "cost_basis"} and NormalizedTaxItemCategory.capital_gains in document_hints:
+        category = NormalizedTaxItemCategory.capital_gains
+        subcategory = field_name
+    elif amount is not None and document_type in {"form16", "salary_slip"} and field_name in {"standard_deduction", "professional_tax"}:
+        category = NormalizedTaxItemCategory.deductions
+        subcategory = field_name
+    elif amount is not None and document_type in {"ais", "form26as"} and field_name == "foreign_dividend_amount":
+        category = NormalizedTaxItemCategory.foreign_dividend_income
+        subcategory = "dividend"
+    elif amount is not None and document_type in {"broker_statement", "capital_gains_statement"} and field_name in {"dividend_income"}:
+        category = NormalizedTaxItemCategory.domestic_dividend_income
+        subcategory = "dividend"
 
     if category is None:
         return None

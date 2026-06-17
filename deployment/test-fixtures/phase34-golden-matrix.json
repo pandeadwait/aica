@@ -1,0 +1,418 @@
+{
+  "scenarios": [
+    {
+      "id": "form16_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form16-sample.json"
+      ],
+      "expected_document_type": "form16",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "salary_income",
+        "deductions",
+        "deductions",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "form26as_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form26as-sample.json"
+      ],
+      "expected_document_type": "form26as",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 6,
+      "expected_categories": [
+        "interest_income",
+        "tds_credits",
+        "interest_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "form26as_variant",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form26as-variant.json"
+      ],
+      "expected_document_type": "form26as",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 6,
+      "expected_categories": [
+        "interest_income",
+        "interest_income",
+        "tds_credits",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "ais_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/ais-sample.json"
+      ],
+      "expected_document_type": "ais",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 5,
+      "expected_categories": [
+        "salary_income",
+        "interest_income",
+        "domestic_dividend_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "ais_variant",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/ais-variant.json"
+      ],
+      "expected_document_type": "ais",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 6,
+      "expected_categories": [
+        "salary_income",
+        "interest_income",
+        "domestic_dividend_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "salary_slip_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/salary-slip-sample.json"
+      ],
+      "expected_document_type": "salary_slip",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "salary_income",
+        "salary_income",
+        "deductions",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_form16",
+        "missing_tds_support"
+      ]
+    },
+    {
+      "id": "salary_slip_variant",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/salary-slip-variant.json"
+      ],
+      "expected_document_type": "salary_slip",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "salary_income",
+        "salary_income",
+        "deductions",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_form16",
+        "missing_tds_support"
+      ]
+    },
+    {
+      "id": "interest_certificate_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/interest-certificate-sample.json"
+      ],
+      "expected_document_type": "interest_certificate",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 8,
+      "expected_categories": [
+        "interest_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_tds_support"
+      ]
+    },
+    {
+      "id": "bank_statement_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/bank-statement-interest-sample.json"
+      ],
+      "expected_document_type": "bank_statement",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 8,
+      "expected_categories": [
+        "interest_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_tds_support"
+      ]
+    },
+    {
+      "id": "ppf_proof_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/ppf-proof-sample.json"
+      ],
+      "expected_document_type": "ppf_elss_proof",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 5,
+      "expected_categories": [
+        "deductions",
+        "deductions"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "insurance_proof_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/insurance-proof-sample.json"
+      ],
+      "expected_document_type": "insurance_premium_proof",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 4,
+      "expected_categories": [
+        "deductions"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "donation_proof_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/donation-proof-sample.json"
+      ],
+      "expected_document_type": "donation_receipt",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 4,
+      "expected_categories": [
+        "deductions"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "form26as_table_csv",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form26as-table-sample.csv"
+      ],
+      "expected_document_type": "form26as",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "interest_income",
+        "interest_income",
+        "tds_credits",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "bank_interest_table_csv",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/bank-interest-table-sample.csv"
+      ],
+      "expected_document_type": "bank_statement",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "interest_income",
+        "interest_income",
+        "tds_credits",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_tds_support"
+      ]
+    },
+    {
+      "id": "broker_statement_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/broker-statement-sample.json"
+      ],
+      "expected_document_type": "broker_statement",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 8,
+      "expected_categories": [
+        "domestic_dividend_income",
+        "capital_gains",
+        "capital_gains"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "capital_gains_statement_clean",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/capital-gains-statement-sample.json"
+      ],
+      "expected_document_type": "capital_gains_statement",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 6,
+      "expected_categories": [
+        "capital_gains",
+        "capital_gains",
+        "capital_gains"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "wrong_year_form16",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form16-wrong-year.json"
+      ],
+      "expected_document_type": "form16",
+      "expected_validation_state": "possibly_relevant",
+      "expected_min_parsed_fields": 10,
+      "expected_categories": [
+        "salary_income",
+        "deductions",
+        "deductions",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "year_mismatch"
+      ]
+    },
+    {
+      "id": "form16_native_pdf",
+      "assessment_year": 2026,
+      "files": [
+        {
+          "type": "generated_pdf",
+          "mode": "native",
+          "filename": "form16-native.pdf",
+          "lines": [
+            "Form 16",
+            "Assessment Year: 2026",
+            "Financial Year: 2025-2026",
+            "Employer Name: Example Technologies Private Limited",
+            "Employee Name: Aarav Sharma",
+            "PAN: ABCDE1234F",
+            "Gross Salary: 1450000.00",
+            "Standard Deduction: 50000.00",
+            "Professional Tax: 2400.00",
+            "Tax Deducted: 182500.00"
+          ]
+        }
+      ],
+      "expected_document_type": "form16",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 4,
+      "expected_categories": [
+        "salary_income",
+        "deductions",
+        "deductions",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "ais_scanned_pdf",
+      "assessment_year": 2026,
+      "files": [
+        {
+          "type": "generated_pdf",
+          "mode": "scanned",
+          "filename": "ais-scanned.pdf",
+          "lines": [
+            "Annual Information Statement",
+            "Assessment Year: 2026",
+            "Financial Year: 2025-2026",
+            "Salary Income: 1450000.00",
+            "Interest Income: 18450.00",
+            "Dividend Income: 6200.00",
+            "Tax Deducted: 184345.00"
+          ]
+        }
+      ],
+      "expected_document_type": "ais",
+      "expected_validation_state": "relevant",
+      "expected_min_parsed_fields": 4,
+      "expected_categories": [
+        "salary_income",
+        "interest_income",
+        "domestic_dividend_income",
+        "tds_credits"
+      ],
+      "required_gap_codes": [
+        "missing_basic_profile",
+        "unresolved_review_items"
+      ]
+    },
+    {
+      "id": "unsupported_upload",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/phase2-unsupported.jpg"
+      ],
+      "expected_upload_status": 400
+    },
+    {
+      "id": "duplicate_upload",
+      "assessment_year": 2026,
+      "files": [
+        "deployment/test-fixtures/form16-sample.json",
+        "deployment/test-fixtures/form16-sample.json"
+      ],
+      "expected_document_type": "form16",
+      "expected_validation_state": "duplicate",
+      "expected_parsed_fields_count": 0,
+      "expected_normalized_items_count": 0,
+      "required_gap_codes": [
+        "missing_basic_profile"
+      ]
+    }
+  ]
+}

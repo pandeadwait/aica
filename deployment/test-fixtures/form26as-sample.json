@@ -1,0 +1,17 @@
+{
+  "document_type": "Form 26AS",
+  "assessment_year": "2026",
+  "financial_year": "2025-2026",
+  "entries": [
+    {
+      "deductor_name": "Example Technologies Private Limited",
+      "income_paid": "1450000.00",
+      "tax_deducted": "182500.00"
+    },
+    {
+      "deductor_name": "Example Bank Limited",
+      "income_paid": "18450.00",
+      "tax_deducted": "1845.00"
+    }
+  ]
+}

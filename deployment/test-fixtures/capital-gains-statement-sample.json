@@ -1,0 +1,11 @@
+{
+  "document_type": "Capital Gains Statement",
+  "assessment_year": "2026",
+  "financial_year": "2025-2026",
+  "security_name": "ABC Growth Fund",
+  "transaction_type": "Redemption",
+  "sale_proceeds": "152000.00",
+  "cost_basis": "125000.00",
+  "capital_gains_total": "27000.00",
+  "event_date": "2025-11-20"
+}

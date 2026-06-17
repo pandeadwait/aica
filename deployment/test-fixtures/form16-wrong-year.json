@@ -1,0 +1,13 @@
+{
+  "document_type": "Form 16",
+  "assessment_year": "2024",
+  "financial_year": "2023-2024",
+  "employer_name": "Example Technologies Private Limited",
+  "employee_name": "Aarav Sharma",
+  "pan": "ABCDE1234F",
+  "tan": "BLRE12345A",
+  "gross_salary": "1450000.00",
+  "standard_deduction": "50000.00",
+  "professional_tax": "2400.00",
+  "tax_deducted": "182500.00"
+}

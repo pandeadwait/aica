@@ -1,0 +1,15 @@
+{
+  "document_type": "salary_slip",
+  "financial_year": "2025-2026",
+  "salary_month": "2025-08",
+  "employer_name": "Example Technologies Private Limited",
+  "employee_name": "Aarav Sharma",
+  "pan": "ABCDE1234F",
+  "basic_salary": "80000.00",
+  "house_rent_allowance": "32000.00",
+  "special_allowance": "14000.00",
+  "gross_salary": "132500.00",
+  "professional_tax": "200.00",
+  "tax_deducted": "14500.00",
+  "net_pay": "117800.00"
+}

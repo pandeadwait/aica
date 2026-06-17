@@ -1,0 +1,11 @@
+{
+  "document_type": "interest_certificate",
+  "assessment_year": "2026",
+  "financial_year": "2025-2026",
+  "account_holder_name": "Aarav Sharma",
+  "issuer_name": "Example Bank Limited",
+  "account_number_masked": "XXXX1234",
+  "interest_period": "2025-04-01 to 2026-03-31",
+  "interest_income": "18450.00",
+  "tax_deducted": "1845.00"
+}

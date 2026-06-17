@@ -1,0 +1,17 @@
+{
+  "document_type": "Form 26AS",
+  "assessment year": "2026",
+  "financial year": "2025-2026",
+  "tax credit rows": [
+    {
+      "deductor": "Variant Bank Limited",
+      "amount paid": "9200.00",
+      "tax credit": "920.00"
+    },
+    {
+      "deductor": "Variant Payroll Services",
+      "amount paid": "1450000.00",
+      "tax credit": "182500.00"
+    }
+  ]
+}

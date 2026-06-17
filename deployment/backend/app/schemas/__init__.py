@@ -8,13 +8,27 @@ from app.schemas.processing import (
     ProcessingJobRead,
     WorkerRunResponse,
 )
+from app.schemas.review import (
+    GapItemRead,
+    GapResolvePayload,
+    ReviewItemOverride,
+    ReviewItemRead,
+    ReviewItemSplit,
+    ReviewItemView,
+)
 
 __all__ = [
     "DocumentProcessingRunResponse",
     "DocumentValidationResultRead",
     "ForeignIncomeEventRead",
+    "GapItemRead",
+    "GapResolvePayload",
     "NormalizedTaxItemRead",
     "ParsedFieldRead",
     "ProcessingJobRead",
+    "ReviewItemOverride",
+    "ReviewItemRead",
+    "ReviewItemSplit",
+    "ReviewItemView",
     "WorkerRunResponse",
 ]

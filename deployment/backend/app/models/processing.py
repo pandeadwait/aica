@@ -3,11 +3,15 @@ from __future__ import annotations
 import enum
 from datetime import date, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import JSON, Date, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.review import CategoryAssignment
 
 
 class ProcessingJobType(str, enum.Enum):
@@ -257,6 +261,7 @@ class NormalizedTaxItem(Base):
         back_populates="normalized_tax_item",
         cascade="all, delete-orphan",
     )
+    category_assignments: Mapped[list["CategoryAssignment"]] = relationship(back_populates="normalized_tax_item")
 
 
 class ForeignIncomeEvent(Base):
@@ -288,6 +293,5 @@ class ForeignIncomeEvent(Base):
     document: Mapped["Document"] = relationship(back_populates="foreign_income_events")
     document_version: Mapped["DocumentVersion"] = relationship(back_populates="foreign_income_events")
     normalized_tax_item: Mapped[NormalizedTaxItem | None] = relationship(back_populates="foreign_income_events")
-
 
 from app.models.document import Document, DocumentVersion  # noqa: E402

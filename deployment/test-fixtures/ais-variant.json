@@ -1,0 +1,23 @@
+{
+  "document_type": "Annual Information Statement",
+  "assessment year": "2026",
+  "financial year": "2025-2026",
+  "sections": [
+    {
+      "section_name": "salary",
+      "salary income": "1450000.00"
+    },
+    {
+      "section_name": "interest",
+      "interest paid": "18450.00"
+    },
+    {
+      "section_name": "dividend",
+      "dividend income": "6200.00"
+    },
+    {
+      "section_name": "tds",
+      "tax credit": "184345.00"
+    }
+  ]
+}

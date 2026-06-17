@@ -1,0 +1,14 @@
+{
+  "document_type": "Salary Slip",
+  "pay_period": "01-Aug-2025 to 31-Aug-2025",
+  "employer": "Example Technologies Private Limited",
+  "employee": "Aarav Sharma",
+  "basic pay": "80000.00",
+  "hra": "32000.00",
+  "performance bonus": "6500.00",
+  "gross total salary": "139000.00",
+  "employee pf": "1800.00",
+  "professional tax": "200.00",
+  "tds deducted": "15000.00",
+  "take home pay": "122000.00"
+}
